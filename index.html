@@ -1,0 +1,627 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>From My Heart ❤️</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --primary: #ff4d6d;
+    --glass: rgba(255, 255, 255, 0.15);
+  }
+
+  body {
+    margin: 0;
+    height: 100vh;
+    background: linear-gradient(135deg, #2b1055, #7597de, #ff4d6d);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    font-family: 'Quicksand', sans-serif;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none; 
+  }
+
+  @keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  #game-container {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+    height: 100%;
+    max-height: 800px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.2);
+  }
+
+  @media (min-width: 450px) {
+      #game-container { border-radius: 20px; height: 90vh; }
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* HUD */
+  #score-board {
+    position: absolute;
+    top: 20px; left: 20px;
+    font-size: 22px; font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    z-index: 10; pointer-events: none;
+  }
+
+  #sound-toggle {
+    position: absolute;
+    top: 20px; right: 20px;
+    cursor: pointer;
+    font-size: 24px;
+    z-index: 10; opacity: 0.8;
+  }
+
+  /* Overlays */
+  .overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    background: rgba(89, 13, 34, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    text-align: center;
+    padding: 20px; box-sizing: border-box;
+    z-index: 20; transition: opacity 0.4s ease;
+  }
+
+  h1 {
+    font-family: 'Great Vibes', cursive;
+    font-size: 3.5rem; margin: 0 0 15px 0;
+    color: #ffdae9;
+    text-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    line-height: 1.1;
+  }
+  h2 { font-family: 'Great Vibes', cursive; font-size: 3rem; margin-bottom: 1rem; color: #ffdae9; }
+  p { font-size: 1.2rem; line-height: 1.6; margin-bottom: 30px; max-width: 90%; }
+
+  button {
+    padding: 16px 45px;
+    font-size: 1.2rem; font-weight: 700;
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 50px; cursor: pointer;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    backdrop-filter: blur(5px);
+    transition: transform 0.2s;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    margin: 10px;
+    position: relative; overflow: hidden;
+  }
+  button:hover { transform: scale(1.05); background: rgba(255, 255, 255, 0.3); }
+  
+  .primary-btn {
+    background: linear-gradient(135deg, #ff758c, #ff7eb3);
+    border: none;
+    box-shadow: 0 0 20px rgba(255, 117, 140, 0.5);
+  }
+
+  .hidden { display: none !important; }
+  
+  #noBtn {
+    transition: all 0.2s; 
+    position: relative;
+    background: #590d22;
+    border: 1px solid #ff4d6d;
+  }
+
+  /* --- NEW EFFECTS --- */
+  
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-15px); }
+    100% { transform: translateY(0px); }
+  }
+
+  @keyframes glowPulse {
+    0% { text-shadow: 0 0 10px #ff4d6d, 0 0 20px #ff4d6d; }
+    50% { text-shadow: 0 0 20px #ff4d6d, 0 0 40px #ff758c; }
+    100% { text-shadow: 0 0 10px #ff4d6d, 0 0 20px #ff4d6d; }
+  }
+
+  @keyframes fadeInSlow {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .final-text {
+    font-family: 'Great Vibes', cursive;
+    font-size: 3.2rem;
+    color: white;
+    margin-bottom: 20px;
+    /* Combine floating and glowing */
+    animation: float 3s ease-in-out infinite, glowPulse 2s infinite alternate;
+  }
+
+  .final-subtext {
+    font-size: 1.5rem;
+    font-weight: bold;
+    opacity: 0; /* Starts hidden */
+    color: #ffdae9;
+  }
+
+  .show-subtext {
+    animation: fadeInSlow 2s forwards;
+  }
+
+</style>
+</head>
+<body>
+
+<div id="game-container">
+  <div id="score-board">Score: 0</div>
+  <div id="sound-toggle">🔇</div>
+  
+  <canvas id="game"></canvas>
+
+  <div id="intro" class="overlay">
+    <h1>Just a Little Game 💕</h1>
+    <p>Tap to fly. Avoid obstacles.<br>Turn up your volume 🔊</p>
+    <button class="primary-btn" onclick="startGame()">Start Journey</button>
+  </div>
+
+  <div id="levelText" class="overlay hidden" style="background: rgba(0,0,0,0.6);"></div>
+
+  <div id="nextLevel" class="overlay hidden">
+    <h2>Nice going 💖</h2>
+    <p>You are doing amazing!</p>
+    <button class="primary-btn" onclick="continueGame()">Next Level ➡️</button>
+  </div>
+
+  <div id="valentine" class="overlay hidden">
+    <h1>Will you be my Valentine Akshata? 💖</h1>
+    <p id="finalMsg">Choose wisely 😌</p>
+    <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; width: 100%;">
+      <button class="primary-btn" onclick="celebrate()">YES 💕</button>
+      <button id="noBtn" onmouseover="dodgeNo()" onclick="dodgeNo()">NO 😏</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/** * AUDIO SYSTEM 
+ */
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+let audioCtx; 
+let isMuted = false; 
+let musicInterval = null;
+
+function initAudio() {
+    if (!audioCtx) audioCtx = new AudioContext();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+}
+
+function startMusic() {
+    if (isMuted || !audioCtx) return;
+    if (musicInterval) clearInterval(musicInterval);
+
+    let noteIndex = 0;
+    const notes = [261.63, 329.63, 392.00, 493.88, 349.23, 440.00, 523.25, 349.23]; 
+    
+    musicInterval = setInterval(() => {
+        if(isMuted) return;
+        playTone(notes[noteIndex % notes.length], 'sine', 0.1, 0.3);
+        noteIndex++;
+    }, 600); 
+}
+
+function stopMusic() {
+    if (musicInterval) clearInterval(musicInterval);
+}
+
+function playTone(freq, type, duration, vol) {
+    if (isMuted || !audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + duration);
+}
+
+function playSound(type) {
+    if (isMuted) return;
+    initAudio(); 
+    if (type === 'jump') playTone(400, 'sine', 0.15, 0.2);
+    else if (type === 'score') {
+        playTone(600, 'triangle', 0.1, 0.1);
+        setTimeout(() => playTone(800, 'triangle', 0.1, 0.1), 50); 
+    } else if (type === 'crash') playTone(100, 'sawtooth', 0.4, 0.3);
+}
+
+const soundToggle = document.getElementById('sound-toggle');
+soundToggle.innerText = "🔊";
+soundToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    initAudio();
+    isMuted = !isMuted;
+    soundToggle.innerText = isMuted ? "🔇" : "🔊";
+    if(!isMuted && running) startMusic();
+    if(isMuted) stopMusic();
+});
+
+
+/** * GAME VARIABLES 
+ */
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+// --- PLAYER IMAGE SETUP ---
+const playerImg = new Image();
+playerImg.src = 'https://i.ibb.co/tRb8kz6/Picsart-26-02-10-17-44-29-656.png'; 
+const playerSize = 100; 
+
+// --- HD CANVAS FIX ---
+function resize() {
+    const container = document.getElementById('game-container');
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = container.clientWidth * dpr;
+    canvas.height = container.clientHeight * dpr;
+    ctx.scale(dpr, dpr);
+}
+window.addEventListener('resize', resize);
+resize();
+
+let heart = { x: 100, y: 260, v: 0 };
+let obstacles = [];
+let particles = [];
+let gravity = 0.5;
+let lift = -7; 
+let frame = 0;
+let running = false;
+let level = 1;
+let score = 0;
+let animId = null;
+let noClickCount = 0;
+
+const levels = {
+  1: { speed: 2.5, gap: 260, duration: 500, color: '#ffb3c6' },
+  2: { speed: 3.5, gap: 230, duration: 700, color: '#ff8fab' },
+  3: { speed: 4.5, gap: 200, duration: 900, color: '#fb6f92' }
+};
+
+/**
+ * GAME LOOP
+ */
+function startGame() {
+  initAudio();
+  startMusic(); 
+  document.getElementById("intro").classList.add('hidden');
+  document.getElementById("valentine").classList.add('hidden');
+  level = 1;
+  score = 0;
+  document.getElementById("score-board").innerText = "Score: 0";
+  resetLevel();
+  showLevelToast("Let's begin gently 💗");
+
+  // DRAW INITIAL STATE (Static) so the screen isn't empty
+  const container = document.getElementById('game-container');
+  ctx.clearRect(0, 0, container.clientWidth, container.clientHeight);
+  drawHeart();
+
+  // DELAY: Wait 2 seconds (reading time) before physics start
+  setTimeout(() => {
+    if (!running) { // Check to prevent double start
+        running = true;
+        loop();
+    }
+  }, 2000); 
+}
+
+function resetLevel() {
+  const container = document.getElementById('game-container');
+  heart.y = container.clientHeight / 2;
+  heart.v = 0;
+  obstacles = [];
+  particles = [];
+  frame = 0;
+}
+
+function loop() {
+  if (!running) return;
+  const container = document.getElementById('game-container');
+  const height = container.clientHeight;
+  const width = container.clientWidth;
+
+  ctx.clearRect(0, 0, width, height);
+  
+  // Physics
+  heart.v += gravity;
+  heart.y += heart.v;
+  
+  // Spawning
+  if (frame % 90 === 0) {
+      const gap = levels[level].gap;
+      const minH = 60;
+      const maxT = height - gap - minH;
+      const top = Math.random() * (maxT - minH) + minH;
+      obstacles.push({ x: width, top, bottom: top + gap, passed: false });
+  }
+  
+  // Update Obstacles
+  for (let i = obstacles.length - 1; i >= 0; i--) {
+      let o = obstacles[i];
+      o.x -= levels[level].speed;
+      
+      if (!o.passed && heart.x > o.x + 50) {
+          score++;
+          o.passed = true;
+          playSound('score');
+          document.getElementById("score-board").innerText = "Score: " + score;
+      }
+      
+      // Collision
+      const hitBox = 30; 
+      if (heart.x + hitBox > o.x && heart.x - hitBox < o.x + 50 && 
+          (heart.y - hitBox < o.top || heart.y + hitBox > o.bottom)) {
+          fail();
+      }
+      
+      if (o.x < -60) obstacles.splice(i, 1);
+  }
+  
+  if (heart.y < 0 || heart.y > height) fail();
+  
+  drawObstacles(height);
+  drawParticles();
+  drawHeart(); 
+  
+  frame++;
+  
+  if (frame > levels[level].duration) completeLevel();
+  else animId = requestAnimationFrame(loop);
+}
+
+function completeLevel() {
+    running = false;
+    stopMusic();
+    if (level < 3) {
+        document.getElementById("nextLevel").classList.remove('hidden');
+    } else {
+        endGame();
+    }
+}
+
+function continueGame() {
+    initAudio();
+    startMusic();
+    document.getElementById("nextLevel").classList.add('hidden');
+    level++;
+    resetLevel();
+    let msg = level === 3 ? "Almost there… ❤️" : "You're doing great 💞";
+    showLevelToast(msg);
+    
+    // DRAW INITIAL STATE
+    const container = document.getElementById('game-container');
+    ctx.clearRect(0, 0, container.clientWidth, container.clientHeight);
+    drawHeart();
+
+    // DELAY for Next Level as well
+    setTimeout(() => {
+        if (!running) {
+            running = true;
+            loop();
+        }
+    }, 2000);
+}
+
+function fail() {
+    running = false;
+    playSound('crash');
+    const container = document.getElementById('game-container');
+    
+    if (level < 3) {
+        ctx.fillStyle = "rgba(255, 0, 0, 0.3)";
+        ctx.fillRect(0,0, container.clientWidth, container.clientHeight);
+        setTimeout(() => {
+            resetLevel();
+            // DRAW STATE before restarting loop
+            ctx.clearRect(0, 0, container.clientWidth, container.clientHeight);
+            drawHeart();
+            
+            // Short delay after death before moving again
+            setTimeout(() => {
+                running = true;
+                loop();
+            }, 500); 
+        }, 800);
+    } else {
+        endGame();
+    }
+}
+
+function endGame() {
+    running = false;
+    stopMusic();
+    cancelAnimationFrame(animId);
+    document.getElementById("valentine").classList.remove('hidden');
+    setTimeout(() => {
+         playTone(261.63, 'sine', 1, 0.2);
+         playTone(329.63, 'sine', 1, 0.2);
+         playTone(392.00, 'sine', 1, 0.2);
+    }, 200);
+}
+
+/** * DRAWING
+ */
+function drawHeart() {
+  ctx.save();
+  ctx.translate(heart.x, heart.y);
+  ctx.rotate(heart.v * 0.05);
+  ctx.shadowColor = "#ff4d6d";
+  ctx.shadowBlur = 15;
+
+  if (playerImg.complete) {
+    ctx.drawImage(playerImg, -playerSize/2, -playerSize/2, playerSize, playerSize);
+  } else {
+    ctx.fillStyle = "#ff1744";
+    ctx.beginPath();
+    ctx.arc(0,0,20,0,Math.PI*2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+function drawObstacles(gameHeight) {
+  ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+  ctx.shadowBlur = 0;
+  obstacles.forEach(o => {
+      ctx.fillRect(o.x, 0, 50, o.top);
+      ctx.fillRect(o.x, o.bottom, 50, gameHeight - o.bottom);
+      ctx.fillStyle = levels[level].color;
+      ctx.fillRect(o.x, o.top - 10, 50, 10);
+      ctx.fillRect(o.x, o.bottom, 50, 10);
+      ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+  });
+}
+
+function drawParticles() {
+    if (heart.v < 0 && running) {
+        particles.push({
+            x: heart.x, y: heart.y,
+            vx: (Math.random()-0.5)*2, vy: (Math.random()-0.5)*2,
+            life: 1, color: `hsl(${330 + Math.random()*30}, 100%, 75%)`
+        });
+    }
+    for(let i=particles.length-1; i>=0; i--){
+        let p = particles[i];
+        p.x += p.vx; p.y += p.vy; p.life -= 0.05;
+        if(p.life <= 0) { particles.splice(i,1); continue; }
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.life;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 3, 0, Math.PI*2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+    }
+}
+
+function showLevelToast(text) {
+    const el = document.getElementById("levelText");
+    el.innerHTML = `<h2>Level ${level}</h2><p>${text}</p>`;
+    el.classList.remove('hidden');
+    setTimeout(() => el.classList.add('hidden'), 2000);
+}
+
+// Input Handling
+function jump() {
+    if(running) {
+        heart.v = lift;
+        playSound('jump');
+    }
+}
+document.getElementById('game-container').addEventListener('mousedown', (e) => {
+    if(e.target.tagName !== 'BUTTON') jump();
+});
+document.getElementById('game-container').addEventListener('touchstart', (e) => {
+    if(e.target.tagName !== 'BUTTON') {
+        e.preventDefault(); 
+        jump();
+    }
+}, {passive: false});
+
+
+// --- FINAL INTERACTIONS WITH TYPEWRITER ---
+function celebrate() {
+    const valScreen = document.getElementById("valentine");
+    // Clear the buttons and previous text
+    valScreen.innerHTML = '';
+    
+    // Create new elements for the typewriter
+    const h1 = document.createElement("h1");
+    h1.className = "final-text"; // Adds glow and float effects
+    
+    const p = document.createElement("p");
+    p.className = "final-subtext"; // Hidden initially
+    p.innerText = "I loveeeeeee youuuuuuu soooo muchhhh myyyyy babbyyyy! Meet me on 28th February for our Valentine's day date 😌";
+    
+    valScreen.appendChild(h1);
+    valScreen.appendChild(p);
+    
+    // Typewriter Logic
+    const msg = "You just made my heart smile 💖✨";
+    let i = 0;
+    
+    function typeWriter() {
+        if (i < msg.length) {
+            h1.innerHTML += msg.charAt(i);
+            i++;
+            setTimeout(typeWriter, 100); // Speed of typing
+        } else {
+            // When typing finishes, show the "I love you" subtext
+            p.classList.add("show-subtext");
+        }
+    }
+    
+    typeWriter();
+
+    // Start celebration effects
+    startMusic(); 
+    const container = document.getElementById('game-container');
+    setInterval(() => {
+        ctx.clearRect(0,0,container.clientWidth,container.clientHeight);
+        for(let i=0; i<5; i++) {
+            particles.push({
+                x: Math.random()*container.clientWidth, y: Math.random()*container.clientHeight,
+                vx: (Math.random()-0.5)*5, vy: (Math.random()-0.5)*5,
+                life: 1, color: `hsl(${Math.random()*360}, 100%, 60%)`
+            });
+        }
+        drawParticles();
+    }, 20);
+}
+
+function dodgeNo() {
+    initAudio(); 
+    noClickCount++;
+    const btn = document.getElementById("noBtn");
+
+    if (noClickCount >= 5) {
+        btn.style.opacity = "0";
+        btn.style.pointerEvents = "none";
+        return;
+    }
+
+    const rect = document.getElementById("valentine").getBoundingClientRect();
+    const newX = Math.random() * (rect.width - 120);
+    const newY = Math.random() * (rect.height - 80);
+    
+    btn.style.position = 'absolute';
+    btn.style.left = Math.max(10, newX) + 'px';
+    btn.style.top = Math.max(10, newY) + 'px';
+}
+
+</script>
+
+</body>
+</html>
